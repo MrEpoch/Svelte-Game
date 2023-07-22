@@ -49,6 +49,7 @@
 		grid-template-columns: repeat(4, 1fr);
 		grid-template-rows: repeat(4, 1fr);
 		grid-gap: 0.5em;
-		height: 100%;
+        height: 100%;
+        perspective: 100vw;
 	}
 </style>
