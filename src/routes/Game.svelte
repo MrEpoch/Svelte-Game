@@ -1,20 +1,32 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import Countdown from './Countdown.svelte';
     import Found from './Found.svelte';
     import Grid from './Grid.svelte';
-	import { levels } from './levels';
 	import type { Level } from './levels';
     import { shuffle } from "./utils";
+	import { createEventDispatcher } from 'svelte';
 
-	let level = levels[0];
+    const dispatch = createEventDispatcher();
 
-	let size: number = level.size;
-	let grid: string[] = create_grid(level);
+	let size: number;
+	let grid: string[] = [];
 	let found: string[] = [];
-    let remaining: number = level.duration;
-    let duration: number = level.duration;
-    let playing: boolean = false;
+    let remaining = 0;
+    let duration = 0;
+    let playing = false;
+    
+    export function start(level: Level) {
+       size = level.size;
+       grid = create_grid(level);
+       remaining = duration = level.duration;
+       resume();
+    }
+
+    export function resume() {
+        playing = true;
+        countdown();
+        dispatch('play');
+    }
 
 	function create_grid(level: Level) {
 		const copy = level.emojis.slice();
@@ -36,35 +48,44 @@
         let remaining_at_start = remaining;
         
         function loop() {
-            if (playing) return;
+            if (!playing) return;
 
             requestAnimationFrame(loop);
 
             remaining = remaining_at_start - (Date.now() - start);
 
             if (remaining <= 0) {
-                // LOST
+                dispatch('lose');
+                playing = false;
             }
         }
         loop();
     }
 
-    onMount(countdown);
-
 </script>
 
-<div class="game">
+<div class="game" style="--size: {size}">
     <div class="info">
-        <Countdown remaining={remaining} duration={level.duration} />
+        {#if playing}
+            <Countdown {remaining} {duration} on:click={() => {
+                 playing = false;
+                 dispatch('pause');
+             }} />
+        {/if}
     </div>
-	<div class="board">
+    <div class="board">
+        {#key grid}
 		<Grid
 			{grid}
 			on:found={(e) => {
 				found = [...found, e.detail.emoji];
+                if (found.length === size * size / 2) {
+                    dispatch('win');
+                }    
             }}
             {found}
-		/>
+        />
+        {/key}
 	</div>
     <div class="info">
         <Found {found} />

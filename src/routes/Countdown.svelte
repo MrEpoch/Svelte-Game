@@ -3,8 +3,8 @@
     export let duration: number;
 </script>
 
-<div class="countdown">
-    <button>
+<div class="countdown" >
+    <button on:click>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>pause-circle</title><path fill="currentColor" d="M15,16H13V8H15M11,16H9V8H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
     </button>
 
@@ -23,11 +23,10 @@
     button {
         color: gray;
         height: 1em;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 8em;
         width: 1em;
+        font-size: 8em;
+        background: transparent;
+        border: none;
     }
 
     svg {
